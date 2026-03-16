@@ -1,0 +1,199 @@
+#include "Engine.h"
+#include "Win32Window.h"
+#include "Graphics/GraphicsContext.h"
+#include "Graphics/Renderer.h"
+#include "Level/Level.h"
+#include "Resource/MeshLoader.h"
+#include "Resource/TextureLoader.h"
+
+namespace Craft
+{
+	Engine::Engine()
+	{
+	}
+
+	Engine::~Engine()
+	{
+	}
+
+	bool Engine::Initialize(HINSTANCE instance)
+	{
+		// 창 객체 생성.
+		window = std::make_unique<Win32Window>(
+			setting.width,
+			setting.height,
+			setting.title,
+			instance,
+			Win32MessageProcedure
+		);
+
+		// 창 초기화.
+		if (!window->Initialize())
+		{
+			__debugbreak();
+			return false;
+		}
+
+		// 컨텍스트 객체 생성.
+		graphicsContext = std::make_unique<GraphicsContext>();
+
+		// 초기화.
+		graphicsContext->Initialize(*window);
+
+		// 렌더러 생성.
+		renderer = std::make_unique<Renderer>();
+		renderer->Initialize();
+
+		// 메시 로더 객체 생성
+		meshLoader = std::make_unique<MeshLoader>();
+
+		// 텍스처 로더 객체 생성
+		textureLoader = std::make_unique<TextureLoader>();
+
+		return true;
+	}
+
+	void Engine::Run()
+	{
+		LARGE_INTEGER counter;
+		QueryPerformanceCounter(&counter);
+		int64_t currentTime = counter.QuadPart;
+		int64_t previousTime = currentTime;
+
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
+
+		float oneFrameTime = 1.0f / setting.framerate;
+
+		// 메시지 처리 루프.
+		// 창에서 발생하는 메시지 처리 루프.
+		// GetMessage - 동기 방식(Blocking 방식).
+		// PeekMessage - 비동기 방식(Non Blocking 방식).
+		// 동기: 처리되기 전까지 다른 동작 안함.
+		// 비동기: 처리되지 않아도 넘어감.
+		MSG msg = { };
+
+		// 창 종료 메시지가 발생할 때까지 실행.
+		while (msg.message != WM_QUIT)
+		{
+			// 창 메시지 처리.
+			// 비동기 방식으로 메시지가 들어왔는지 확인.
+			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+			{
+				// 전달받은 메시지를 적절하게 변환.
+				TranslateMessage(&msg);
+
+				// 변환한 메시지를 처리 함수에 전달.
+				DispatchMessage(&msg);
+			}
+
+			// 창 메시지가 없으면 엔진 로직 처리.
+			else
+			{
+				QueryPerformanceCounter(&counter);
+				currentTime = counter.QuadPart;
+
+				float deltaTime = static_cast<float>(currentTime - previousTime)
+					/ static_cast<float>(frequency.QuadPart);
+
+				if (deltaTime >= oneFrameTime)
+				{
+					OnInitialized();
+
+					BeginPlay();
+
+					Tick(deltaTime);
+
+					Draw();
+
+					if (mainLevel)
+					{
+						mainLevel->ProcessAddAndDestroyActors();
+					}
+
+					if (nextLevel)
+					{
+						if (mainLevel)
+						{
+							mainLevel.reset();
+						}
+
+						mainLevel = std::move(nextLevel);
+						nextLevel.reset();
+					}
+
+					previousTime = currentTime;
+				}
+			}
+		}
+	}
+
+	LRESULT Engine::Win32MessageProcedure(
+		HWND handle, UINT message, WPARAM wparam, LPARAM lparam)
+	{
+		switch (message)
+		{
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
+
+		case WM_PAINT:
+		{
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(handle, &ps);
+
+			// All painting occurs here, between BeginPaint and EndPaint.
+			FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
+			EndPaint(handle, &ps);
+		}
+		return 0;
+
+		}
+		return DefWindowProc(handle, message, wparam, lparam);
+	}
+
+	void Engine::OnInitialized()
+	{
+		if (!mainLevel || mainLevel->HasInitialized())
+		{
+			return;
+		}
+
+		mainLevel->OnInitialized();
+	}
+
+	void Engine::BeginPlay()
+	{
+		if (!mainLevel)
+		{
+			return;
+		}
+
+		mainLevel->BeginPlay();
+	}
+	
+	void Engine::Tick(float deltaTime)
+	{
+		if (!mainLevel)
+		{
+			return;
+		}
+
+		mainLevel->Tick(deltaTime);
+	}
+
+	void Engine::Draw()
+	{
+		if (!mainLevel)
+		{
+			return;
+		}
+
+		graphicsContext->BeginScene(0.6f, 0.7f, 0.8f);
+
+		mainLevel->Draw();
+		renderer->DrawScene();
+
+		graphicsContext->EndScene(setting.vsync);
+	}
+}

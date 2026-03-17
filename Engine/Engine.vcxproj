@@ -103,6 +103,7 @@ xcopy $(OutDir)\Engine.lib ..\Library\Engine\$(Configuration)\ /e /y /i</Command
     <ClCompile Include="Actor\Actor.cpp" />
     <ClCompile Include="Actor\CameraActor.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
+    <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Core\Win32Window.cpp" />
     <ClCompile Include="Graphics\GraphicsContext.cpp" />
     <ClCompile Include="Graphics\Renderer.cpp" />
@@ -124,6 +125,7 @@ xcopy $(OutDir)\Engine.lib ..\Library\Engine\$(Configuration)\ /e /y /i</Command
     <ClInclude Include="Actor\CameraActor.h" />
     <ClInclude Include="Core\Common.h" />
     <ClInclude Include="Core\Engine.h" />
+    <ClInclude Include="Core\Input.h" />
     <ClInclude Include="Core\Win32Window.h" />
     <ClInclude Include="Graphics\GraphicsContext.h" />
     <ClInclude Include="Graphics\Renderer.h" />

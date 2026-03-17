@@ -22,9 +22,15 @@ namespace Craft
 		// 초기화 함수.
 		bool Initialize();
 
-		// Getter.
+		// Getter / Setter
 		inline uint32_t Width() const { return width; }
 		inline uint32_t Height() const { return height; }
+		inline void SetWithAndHeight(uint32_t newWidth, uint32_t newHeight)
+		{
+			width = newWidth;
+			height = newHeight;
+		}
+
 		inline HWND Handle() const { return handle; }
 
 	private:

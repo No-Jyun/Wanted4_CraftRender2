@@ -43,6 +43,16 @@ namespace Craft
 			nextLevel = std::make_shared<T>(std::forward<Args>(args)...);
 		}
 
+		// 화면 크기 변경 이벤트 처리 함수
+		void OnResize(uint32_t width, uint32_t height);
+
+		// 싱글톤 접근 함수
+		static Engine& Get();
+
+		// 화면 너비 / 높이 반환 함수
+		uint32_t GetWidth() const;
+		uint32_t GetHeight() const;
+
 	protected:
 		// Win32 윈도우 메시지 처리 함수(콜백 함수).
 		static LRESULT CALLBACK Win32MessageProcedure(
@@ -79,5 +89,8 @@ namespace Craft
 
 		// 엔진 설정 변수.
 		EngineSetting setting;
+
+		// 싱글톤 구현을 위한 전역 변수
+		static Engine* instance;
 	};
 }

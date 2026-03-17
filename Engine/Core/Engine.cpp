@@ -8,8 +8,11 @@
 
 namespace Craft
 {
+	Engine* Engine::instance = nullptr;
+
 	Engine::Engine()
 	{
+		instance = this;
 	}
 
 	Engine::~Engine()
@@ -128,6 +131,35 @@ namespace Craft
 		}
 	}
 
+	void Engine::OnResize(uint32_t width, uint32_t height)
+	{
+		// 그래픽스 컨텍스트에게 넘겨주기
+		if (graphicsContext)
+		{
+			graphicsContext->OnResize(width, height);
+		}
+
+		// 창 객체의 변수 값 조정
+		window->SetWithAndHeight(width, height);
+	}
+
+	Engine& Engine::Get()
+	{
+		assert(instance);
+		return *instance;
+	}
+
+	// 화면 너비 / 높이 반환 함수
+	uint32_t Engine::GetWidth() const
+	{
+		return window->Width();
+	}
+
+	uint32_t Engine::GetHeight() const
+	{
+		return window->Height();
+	}
+
 	LRESULT Engine::Win32MessageProcedure(
 		HWND handle, UINT message, WPARAM wparam, LPARAM lparam)
 	{
@@ -145,6 +177,31 @@ namespace Craft
 			// All painting occurs here, between BeginPaint and EndPaint.
 			FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
 			EndPaint(handle, &ps);
+		}
+		return 0;
+
+		// 창 크기 변경 이벤트 처리
+		case WM_SIZE:
+		{
+			// 최소화인 경우 무시
+			if (wparam == SIZE_MINIMIZED)
+			{
+				break;
+			}
+
+			// null 체크
+			if (!instance)
+			{
+				break;
+			}
+
+			// 변경된 창 크기 값 가져오기
+			uint32_t width = LOWORD(lparam);
+			uint32_t height = HIWORD(lparam);
+
+			// 변경 이벤트 발행
+			instance->OnResize(width, height);
+
 		}
 		return 0;
 

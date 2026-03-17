@@ -14,7 +14,8 @@ void TriangleDemoLevel::OnInitialized()
 	SpawnActor<QuadMeshActor>();
 
 	// 카메라 액터 생성
-	std::shared_ptr<CameraActor> camera = SpawnActor<Craft::CameraActor>();
-	camera->transform->position.x = 0.5f;
-	camera->transform->rotation.z = 30.0f;
+	std::shared_ptr<CameraActor> camera = SpawnActor<CameraActor>();
+	//camera->transform->position.x = 0.5f;
+	camera->transform->position.z = -2.0f;
+	//camera->transform->rotation.y = -2.0f;
 }

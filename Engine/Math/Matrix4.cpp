@@ -164,9 +164,44 @@ namespace Craft
 		// 업 벡터 구하기
 		Vector3 upDir = Cross(forward, right);
 
-		// -> 회전 구하기 완료
+		// -> 회전(- 방향) 구하기 완료
+		// 내적을 하는 이유 : 위치를 보정해야하는데 카메라의 방향을 고려한다
+		float x = Dot(right, position);
+		float y = Dot(upDir, position);
+		float z = Dot(forward, position);
 
-		return Matrix4();
+		// 출력용 행렬
+		Matrix4 m;
+		m.m00 = right.x;	m.m01 = right.y;	m.m02 = right.z;	m.m03 = 0.0f;
+		m.m10 = upDir.x;	m.m11 = upDir.y;	m.m12 = upDir.z;	m.m13 = 0.0f;
+		m.m20 = forward.x;	m.m21 = forward.y;	m.m22 = forward.z;	m.m23 = 0.0f;
+		m.m30 = -x;			m.m31 = -y;			m.m32 = -z;			m.m33 = 1.0f;
+
+		return m;
+	}
+
+	Matrix4 Matrix4::Perspective(
+		float fieldOfView, 
+		float width, 
+		float height, 
+		float nearDistance, 
+		float farDistance)
+	{
+		float aspect = width / height;
+		float fov = fieldOfView / 2.0f * degreeToRadian;
+		float h = 1.0f / std::tanf(fov);
+		float w = h / aspect;
+
+		float a = (farDistance) / (farDistance - nearDistance);
+		float b = (-nearDistance * farDistance) / (farDistance - nearDistance);
+
+		Matrix4 m;
+		m.m00 = w;		m.m01 = 0.0f;	m.m02 = 0.0f;	m.m03 = 0.0f;
+		m.m10 = 0.0f;	m.m11 = h;		m.m12 = 0.0f;	m.m13 = 0.0f;
+		m.m20 = 0.0f;	m.m21 = 0.0f;	m.m22 = a;		m.m23 = 1.0f;
+		m.m30 = 0.0f;	m.m31 = 0.0f;	m.m32 = b;		m.m33 = 0.0f;
+
+		return m;
 	}
 
 	Matrix4& Matrix4::operator=(const Matrix4& other)

@@ -53,7 +53,9 @@ namespace Craft
 		renderQueue.emplace_back(command);
 	}
 
-	void Renderer::UpdateCameraMatrix(const Matrix4& viewMatrix)
+	void Renderer::UpdateCameraMatrix(
+		const Matrix4& viewMatrix, 
+		const Matrix4& projectionMatrix)
 	{
 		// 카메라 버퍼 업데이트
 		auto& context = GraphicsContext::Get().GetDeviceContext();
@@ -63,10 +65,10 @@ namespace Craft
 			L"Failed to map camera buffer.");
 
 		// 행렬 전치
-		Matrix4 viewMatrixRef = Matrix4::Transpose(viewMatrix);
+		Matrix4 cameraMatrixRef = Matrix4::Transpose(viewMatrix * projectionMatrix);
 
 		// 데이터 업데이트
-		memcpy(resource.pData, &viewMatrixRef, sizeof(Matrix4));
+		memcpy(resource.pData, &cameraMatrixRef, sizeof(Matrix4));
 
 		context.Unmap(cameraBuffer, 0);
 	}

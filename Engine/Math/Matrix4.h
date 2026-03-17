@@ -51,6 +51,14 @@ namespace Craft
 			const Vector3& target, 
 			const Vector3& up);
 
+		// 원근 투영 행렬 (Perspective)
+		static 	Matrix4 Perspective(
+			float fieldOfView,		// 시야각
+			float width,			// 화면 너비
+			float height,			// 화면 높이
+			float nearDistance,		// 뷰 프러스텀 가까운 위치	(실제 보이기 시작하는 위치)
+			float farDistance);		// 뷰 프러스텀 먼 위치		(삼각형의 밑변)
+
 		// 연산자 오버로딩
 		Matrix4& operator=(const Matrix4& other);
 		Matrix4 operator*(const Matrix4& other) const;

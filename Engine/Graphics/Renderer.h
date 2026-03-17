@@ -38,7 +38,9 @@ namespace Craft
 		);
 
 		// 카메라 행렬 제출 함수
-		void UpdateCameraMatrix(const Matrix4& viewMatrix);
+		void UpdateCameraMatrix(
+			const Matrix4& viewMatrix,
+			const Matrix4& projectionMatrix);
 		
 		// DrawCall 발생 처리.
 		// -> 렌더링 파이프라인 실행(구동).

@@ -66,6 +66,38 @@ namespace Craft
 		swapChain->Present(vsync, 0);
 	}
 
+	void GraphicsContext::OnResize(uint32_t width, uint32_t height)
+	{
+		// 예외처리
+		if (!device || !context || !swapChain)
+		{
+			return;
+		}
+
+		// 컨텍스트 비우기
+		context->ClearState();
+		context->Flush();
+
+		// 렌더 타겟 뷰 해제
+		SafeRelease(renderTargetView);
+
+		// 스왑 체인 크기 재조정
+		ThrowIfFailed(
+			swapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0),
+			L"Failed to resize swapchain buffer"
+		);
+
+		// 렌더 타겟 재생성
+		CreateRenderTargetView();
+
+		// 뷰포트 업데이트
+		viewport.Width = static_cast<float>(width);
+		viewport.Height = static_cast<float>(height);
+
+		// 뷰포트 설정
+		context->RSSetViewports(1, &viewport);
+	}
+
 	GraphicsContext& GraphicsContext::Get()
 	{
 		assert(instance);

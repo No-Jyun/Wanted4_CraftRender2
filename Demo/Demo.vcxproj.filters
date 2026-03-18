@@ -30,6 +30,9 @@
     <ClCompile Include="Actor\QuadMeshActor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Actor\CameraMovementActor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Level\TriangleDemoLevel.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Actor\QuadMeshActor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor\CameraMovementActor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

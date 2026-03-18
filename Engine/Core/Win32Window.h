@@ -25,7 +25,7 @@ namespace Craft
 		// Getter / Setter
 		inline uint32_t Width() const { return width; }
 		inline uint32_t Height() const { return height; }
-		inline void SetWithAndHeight(uint32_t newWidth, uint32_t newHeight)
+		inline void SetWidthAndHeight(uint32_t newWidth, uint32_t newHeight)
 		{
 			width = newWidth;
 			height = newHeight;

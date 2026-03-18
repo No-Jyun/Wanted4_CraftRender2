@@ -5,6 +5,7 @@
 #include "Level/Level.h"
 #include "Resource/MeshLoader.h"
 #include "Resource/TextureLoader.h"
+#include "Core/Input.h"
 
 namespace Craft
 {
@@ -52,6 +53,9 @@ namespace Craft
 
 		// 텍스처 로더 객체 생성
 		textureLoader = std::make_unique<TextureLoader>();
+
+		// 입력 객체 생성
+		input = std::make_unique<Input>();
 
 		return true;
 	}
@@ -140,7 +144,7 @@ namespace Craft
 		}
 
 		// 창 객체의 변수 값 조정
-		window->SetWithAndHeight(width, height);
+		window->SetWidthAndHeight(width, height);
 	}
 
 	Engine& Engine::Get()
@@ -205,6 +209,39 @@ namespace Craft
 		}
 		return 0;
 
+		// 키 입력 처리.
+		case WM_KEYDOWN:
+		case WM_KEYUP:
+		case WM_SYSKEYDOWN:
+		case WM_SYSKEYUP:
+		{
+			// 포커스 확인.
+			if (GetFocus() != handle)
+			{
+				break;
+			}
+
+			// 예외 처리.
+			if (!Input::IsValid())
+			{
+				break;
+			}
+
+			// 키 눌림/해제.
+			bool isKeyUp = (lparam & ((int64_t)1 << 30)) != 0;
+			bool isKeyDown = (lparam & ((int64_t)1 << 31)) == 0;
+
+			// 두 상태가 다를 때만 이벤트 전달.
+			if (isKeyUp != isKeyDown)
+			{
+				// 어떤 키가 눌렸는지 확인 -> wparam.
+				uint32_t vkCode = static_cast<uint32_t>(wparam);
+
+				// 키 눌림 및 해제 상태 전달.
+				Input::Get().SetKeyUpDown(vkCode, isKeyUp, isKeyDown);
+			}
+		}
+		return 0;
 		}
 		return DefWindowProc(handle, message, wparam, lparam);
 	}

@@ -13,6 +13,7 @@ namespace Craft
 	class Level;
 	class MeshLoader;
 	class TextureLoader;
+	class Input;
 
 	// 엔진 설정.
 	struct EngineSetting
@@ -86,6 +87,9 @@ namespace Craft
 		std::shared_ptr<Level> mainLevel;
 
 		std::shared_ptr<Level> nextLevel;
+
+		// 입력 처리 객체
+		std::unique_ptr<Input> input;
 
 		// 엔진 설정 변수.
 		EngineSetting setting;

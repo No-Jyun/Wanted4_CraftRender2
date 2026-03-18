@@ -27,6 +27,11 @@ namespace Craft
 		Vector3 rotation = Vector3::Zero;
 		Vector3 scale = Vector3::One;
 
+		// 트랜스폼 기준 로컬 방향
+		Vector3 Right() const;
+		Vector3 Up() const;
+		Vector3 Forward() const;
+
 	private:
 		// 트랜스폼을 구성하는 행렬
 		Matrix4 transformMatrix;

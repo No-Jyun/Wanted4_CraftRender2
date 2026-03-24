@@ -25,6 +25,12 @@ namespace Craft
 			0
 		);
 
+		// 24비트 (채널 수 3개) 텍스처인 경우 32비트로 변환
+		if (data->channelCount == 3)
+		{
+			ConvertToRGBA(data);
+		}
+
 		// 예외처리
 		if (!data->pixelArray)
 		{
@@ -138,5 +144,56 @@ namespace Craft
 			// 샘플러 바인딩
 			context.PSSetSamplers(index, 1, &samplerState);
 		}
+	}
+	void Texture::ConvertToRGBA(std::unique_ptr<TextureData>& textureData)
+	{
+		// 목표 채널 수 (4개)
+		const uint32_t targetChannelCount = 4;
+
+		// 픽셀 수
+		const uint32_t pixelCount = textureData->width * textureData->height;
+
+		// 이미지 버퍼 크기 = 픽셀 수 x 채널 수 (버퍼 생성 용)
+		const uint32_t size = pixelCount * targetChannelCount;
+
+		// 새로운 이미지 버퍼 생성
+		uint8_t* imageBuffer = new uint8_t[size];
+
+		// 모든 데이터를 초기화
+		memset(imageBuffer, 255, size);
+
+		// 원본 이미지 데이터 포인터
+		uint8_t* source = reinterpret_cast<uint8_t*>(textureData->pixelArray);
+
+		// 새로운 이미지 데이터를 생성할 버퍼 포인터
+		uint8_t* dest = imageBuffer;
+
+		// 기준 이미지 데이터 + 알파 채널 추가 처리
+		for (uint32_t ix = 0; ix < pixelCount; ix++)
+		{
+			// 메모리 복사 (3바이트 만큼만 복사)
+			memcpy(dest, source, sizeof(uint32_t) * 3);
+
+			//dest[0] = source[0];
+			//dest[1] = source[1];
+			//dest[2] = source[2];
+
+			//dest[3] = 255;
+
+			// 다음 위치로 메모리 이동
+			source += 3;
+			dest += 4;
+		}
+
+		// 기존에 로드한 픽셀 정보 해제
+		if (textureData->pixelArray)
+		{
+			free(textureData->pixelArray);
+			textureData->pixelArray = nullptr;
+		}
+
+		// 새로 생성한 이미지 데이터로 설정
+		textureData->pixelArray = imageBuffer;
+		textureData->channelCount = 4;
 	}
 }

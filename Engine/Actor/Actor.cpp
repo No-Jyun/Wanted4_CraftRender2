@@ -1,6 +1,7 @@
 #include "Actor.h"
 #include "Graphics/Renderer.h"
 #include "Math/Transform.h"
+#include "Core/Engine.h"
 
 namespace Craft
 {
@@ -35,6 +36,12 @@ namespace Craft
 		}
 
 		Renderer::Get().Submit(mesh.lock(), shader, transform);
+	}
+
+	void Actor::QuitGame()
+	{
+		// 엔진 종료 요청
+		Engine::Get().Quit();
 	}
 
 	void Actor::SetOwner(std::weak_ptr<Level> newOwner)

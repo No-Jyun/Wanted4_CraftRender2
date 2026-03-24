@@ -41,6 +41,10 @@ namespace Craft
 		void Bind(uint32_t index = 0);
 
 	private:
+		// 24비트 텍스처를 32bit 텍스처로 변환하는 함수
+		void ConvertToRGBA(std::unique_ptr<TextureData>& textureData);
+
+	private:
 		// 텍스처 이름
 		std::string name;
 

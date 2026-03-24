@@ -37,6 +37,9 @@ namespace Craft
 		// 엔진 루프 실행 함수.
 		void Run();
 
+		// 엔진 종료 함수
+		void Quit();
+
 		template<typename T, typename ...Args, 
 			typename = std::enable_if_t<std::is_base_of<Level, T>::value>>
 		void AddNewLevel(Args&&... args)
@@ -69,6 +72,10 @@ namespace Craft
 		void Draw();
 
 	protected:
+
+		// 엔진 종료 플래그
+		bool isQuit = false;
+
 		// 창 객체.
 		std::unique_ptr<Win32Window> window;
 

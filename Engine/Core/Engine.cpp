@@ -6,6 +6,7 @@
 #include "Resource/MeshLoader.h"
 #include "Resource/TextureLoader.h"
 #include "Core/Input.h"
+#include <windowsx.h>
 
 namespace Craft
 {
@@ -83,6 +84,12 @@ namespace Craft
 		// 창 종료 메시지가 발생할 때까지 실행.
 		while (msg.message != WM_QUIT)
 		{
+			// 엔진 종료 처리
+			if (isQuit)
+			{
+				break;
+			}
+
 			// 창 메시지 처리.
 			// 비동기 방식으로 메시지가 들어왔는지 확인.
 			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -129,10 +136,18 @@ namespace Craft
 						nextLevel.reset();
 					}
 
+					// 입력 정리
+					input->ResetInputs();
+
 					previousTime = currentTime;
 				}
 			}
 		}
+	}
+
+	void Engine::Quit()
+	{
+		isQuit = true;
 	}
 
 	void Engine::OnResize(uint32_t width, uint32_t height)
@@ -242,6 +257,72 @@ namespace Craft
 			}
 		}
 		return 0;
+
+		// 마우스 입력 처리
+		case WM_LBUTTONDOWN:
+		{
+			// 예외처리
+			if (!Input::IsValid())
+			{
+				break;
+			}
+
+			Input::Get().SetButtonUpDown(0, false, true);
+		} return 0;
+
+		case WM_LBUTTONUP:
+		{
+			// 예외처리
+			if (!Input::IsValid())
+			{
+				break;
+			}
+
+			Input::Get().SetButtonUpDown(0, true, false);
+		} return 0;
+
+		case WM_RBUTTONDOWN:
+		{
+			// 예외처리
+			if (!Input::IsValid())
+			{
+				break;
+			}
+
+			Input::Get().SetButtonUpDown(1, false, true);
+		} return 0;
+
+		case WM_RBUTTONUP:
+		{
+			// 예외처리
+			if (!Input::IsValid())
+			{
+				break;
+			}
+
+			Input::Get().SetButtonUpDown(0, true, false);
+		} return 0;
+
+		// 마우스 이동 처리
+		case WM_MOUSEMOVE:
+		{
+			// 예외처리
+			if (!Input::IsValid())
+			{
+				break;
+			}
+
+			// 좌표 값 추출 (싱글 모니터만 대응)
+			//int xPosition = LOWORD(lparam);
+			//int yPosition = HIWORD(lparam);
+			int xPosition = GET_X_LPARAM(lparam);
+			int yPosition = GET_Y_LPARAM(lparam);
+
+			// 설정
+			Input::Get().SetMousePosition(xPosition, yPosition);
+
+		} return 0;
+
 		}
 		return DefWindowProc(handle, message, wparam, lparam);
 	}

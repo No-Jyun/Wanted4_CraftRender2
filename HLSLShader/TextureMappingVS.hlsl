@@ -2,6 +2,7 @@ struct VSInput
 {
     float3 position : POSITION;
     float2 texCoord : TEXCOORD;
+    float3 normal : NORMAL;
 };
 
 // Constant Buffer (World Matrix)
@@ -22,6 +23,7 @@ struct VSOutput
 {
     float4 position : SV_POSITION;
     float2 texCoord : TEXCOORD;
+    float3 normal : NORMAL;
 };
 
 VSOutput main(VSInput input)
@@ -32,6 +34,9 @@ VSOutput main(VSInput input)
     output.position = mul(output.position, cameraMatrix);
     
     output.texCoord = input.texCoord;
+    
+    // transform local normal to world normal
+    output.normal = mul(input.normal, (float3x3) worldMatrix);
     
     return output;
 }

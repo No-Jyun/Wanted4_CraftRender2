@@ -12,9 +12,8 @@ private:
 	virtual void Tick(float deltaTime) override;
 
 private:
-	float moveSpeed = 0.1f;
+	float moveSpeed = 1.0f;
 	float dragSpeedOffset = 0.05f;
-
 
 };
 

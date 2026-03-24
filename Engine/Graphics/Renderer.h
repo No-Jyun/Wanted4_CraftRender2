@@ -19,6 +19,15 @@ namespace Craft
 		std::shared_ptr<Transform> transform;
 	};
 
+	// 카메라 버퍼 데이터
+	struct CameraData
+	{
+		Matrix4 matrix;
+		Vector3 position;
+		// 상수 버퍼용 구조체는 16바이트 정렬이 필수 !!!
+		float padding;
+	};
+
 	// DrawCall 담당.
 	// RHI - Render Hardware Interface: 그래픽카드.
 	class Renderer
@@ -40,7 +49,8 @@ namespace Craft
 		// 카메라 행렬 제출 함수
 		void UpdateCameraMatrix(
 			const Matrix4& viewMatrix,
-			const Matrix4& projectionMatrix);
+			const Matrix4& projectionMatrix,
+			const Vector3& position);
 		
 		// DrawCall 발생 처리.
 		// -> 렌더링 파이프라인 실행(구동).

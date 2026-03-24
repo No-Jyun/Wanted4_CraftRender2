@@ -30,11 +30,12 @@ namespace Craft
 
 		// 버퍼 생성을 위한 구조체
 		D3D11_BUFFER_DESC bufferDesc = {};
-		bufferDesc.ByteWidth = sizeof(Matrix4);
+		bufferDesc.ByteWidth = sizeof(CameraData);
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
+		// 버퍼 생성
 		ThrowIfFailed(
 			device.CreateBuffer(&bufferDesc, nullptr, &cameraBuffer),
 			L"Failed to Create Camera Buffer.");
@@ -55,7 +56,8 @@ namespace Craft
 
 	void Renderer::UpdateCameraMatrix(
 		const Matrix4& viewMatrix, 
-		const Matrix4& projectionMatrix)
+		const Matrix4& projectionMatrix,
+		const Vector3& position)
 	{
 		// 카메라 버퍼 업데이트
 		auto& context = GraphicsContext::Get().GetDeviceContext();
@@ -64,11 +66,17 @@ namespace Craft
 		ThrowIfFailed(context.Map(cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource),
 			L"Failed to map camera buffer.");
 
+		// 카메라 데이터
+		CameraData newData;
+
 		// 행렬 전치
-		Matrix4 cameraMatrixRef = Matrix4::Transpose(viewMatrix * projectionMatrix);
+		newData.matrix = Matrix4::Transpose(viewMatrix * projectionMatrix);
+
+		// 카메라 위치 저장
+		newData.position = position;
 
 		// 데이터 업데이트
-		memcpy(resource.pData, &cameraMatrixRef, sizeof(Matrix4));
+		memcpy(resource.pData, &newData, sizeof(CameraData));
 
 		context.Unmap(cameraBuffer, 0);
 	}

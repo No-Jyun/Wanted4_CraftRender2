@@ -67,6 +67,6 @@ namespace Craft
 		Actor::Draw();
 
 		// 렌더러에 행렬 제출
-		Renderer::Get().UpdateCameraMatrix(viewMatrix, projectionMatrix);
+		Renderer::Get().UpdateCameraMatrix(viewMatrix, projectionMatrix, transform->position);
 	}
 }

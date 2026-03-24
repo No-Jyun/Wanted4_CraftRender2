@@ -23,7 +23,7 @@ QuadMeshActor::QuadMeshActor()
 	//std::shared_ptr<TextureMappingShader> textureMappingShader = std::make_shared<TextureMappingShader>("T_coord.png");
 
 	// 왜 됨? UpCasting
-	shader = std::make_shared<TextureMappingShader>("T_coord.png");;
+	shader = std::make_shared<TextureMappingShader>("2k_earth_daymap.jpg");;
 
 	// @Test: 텍스처 로드 테스트
 	//std::shared_ptr<Texture> texture = std::make_shared<Texture>("T_coord.png");

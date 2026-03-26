@@ -75,6 +75,9 @@
     <ClCompile Include="Actor\LightActor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Shader\SpecularMappingShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Win32Window.h">
@@ -143,11 +146,16 @@
     <ClInclude Include="Actor\LightActor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Shader\SpecularMappingShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSLShader\DefaultVS.hlsl" />
     <FxCompile Include="HLSLShader\DefaultPS.hlsl" />
     <FxCompile Include="HLSLShader\TextureMappingVS.hlsl" />
     <FxCompile Include="HLSLShader\TextureMappingPS.hlsl" />
+    <FxCompile Include="HLSLShader\SpecularMappingVS.hlsl" />
+    <FxCompile Include="HLSLShader\SpecularMappingPS.hlsl" />
   </ItemGroup>
 </Project>

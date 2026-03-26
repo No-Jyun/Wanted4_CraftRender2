@@ -16,12 +16,14 @@ cbuffer Light : register(b0)
     float lightPadding;
 };
 
-Texture2D map;
-SamplerState mapSampler;
+Texture2D diffuseMap : register(t0);
+Texture2D specularMap : register(t1);
+SamplerState mapSampler : register(s0);
 
 float4 main(VSOutput input) : SV_TARGET
 {
-    float4 diffuseMapColor = map.Sample(mapSampler, input.texCoord);
+    float4 diffuseMapColor = diffuseMap.Sample(mapSampler, input.texCoord);
+    float4 specularMapColor = specularMap.Sample(mapSampler, input.texCoord);
     
     // light direction.
     //float3 lightDir = normalize(float3(500.0f, 500.0f, -500.0f));
@@ -34,7 +36,7 @@ float4 main(VSOutput input) : SV_TARGET
     float NdotL = dot(worldNormal, -lightDir);
     
     // Specular (Phong-shader).
-    float specular = 0.0f;
+    float3 specular = 0.0f;
     if (NdotL > 0)
     {
         // RdotV.
@@ -57,7 +59,7 @@ float4 main(VSOutput input) : SV_TARGET
         float shineness = 16;
         
         // specular.
-        specular = pow(NdotH, shineness);
+        specular = specularMapColor.rgb * pow(NdotH, shineness);
     }
     
     // Diffuse + Specular + Ambient(Global-Illumination/Local-Illumination).
@@ -71,7 +73,7 @@ float4 main(VSOutput input) : SV_TARGET
     float4 diffuse = diffuseMapColor * NdotL;
     
     // Specular.
-    float4 specularColor = specular * float4(lightColor, 1);
+    float4 specularColor = float4(specular, 1) * float4(lightColor, 1);
     
     finalColor = diffuse + specularColor;
     

@@ -3,6 +3,7 @@
 
 #include "Shader/Shader.h"
 #include "Shader/TextureMappingShader.h"
+#include "Shader/SpecularMappingShader.h"
 
 #include "Texture/Texture.h"
 #include "Resource/TextureLoader.h"
@@ -23,7 +24,7 @@ QuadMeshActor::QuadMeshActor()
 	//std::shared_ptr<TextureMappingShader> textureMappingShader = std::make_shared<TextureMappingShader>("T_coord.png");
 
 	// 왜 됨? UpCasting
-	shader = std::make_shared<TextureMappingShader>("2k_earth_daymap.jpg");;
+	shader = std::make_shared<SpecularMappingShader>("2k_earth_daymap.jpg", "2k_earth_specular_map.jpg");
 
 	// @Test: 텍스처 로드 테스트
 	//std::shared_ptr<Texture> texture = std::make_shared<Texture>("T_coord.png");

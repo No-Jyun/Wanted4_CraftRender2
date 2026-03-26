@@ -44,16 +44,20 @@ float4 main(VSOutput input) : SV_TARGET
         
         // View Direction.
         float3 viewDir = normalize(input.worldPosition - input.cameraPosition);
+        
+        // Half-Vector
+        float3 halfVector = normalize(-lightDir + -viewDir);
 
         // RdotV.
         //float RdotV = max(0, dot(reflection, viewDir));
-        float RdotV = saturate(dot(reflection, -viewDir));
+        //float RdotV = saturate(dot(reflection, -viewDir));
+        float NdotH = saturate(dot(halfVector, worldNormal));
         
         // shineness.
         float shineness = 16;
         
         // specular.
-        specular = pow(RdotV, shineness);
+        specular = pow(NdotH, shineness);
     }
     
     // Diffuse + Specular + Ambient(Global-Illumination/Local-Illumination).

@@ -5,21 +5,17 @@ struct VSInput
     float3 normal : NORMAL;
 };
 
-// Constant Buffer (World Matrix)
-// Local to World
-// 1 - (ad - bc)
 cbuffer Transform : register(b0)
 {
-    matrix worldMatrix;
-}
+    matrix world;
+};
 
-// World to View, View to Projection
-// Constant-buffer must be aligned to 16 bytes...
+// Constant-buffer must be aligned by 16bytes..
 cbuffer Camera : register(b1)
 {
-    matrix cameraMatrix;
+    matrix camera;
     float3 cameraPosition;
-    // !!!!!!!!!!
+    // !!!!!!!!.
     float padding;
 };
 
@@ -29,21 +25,22 @@ struct VSOutput
     float2 texCoord : TEXCOORD;
     float3 normal : NORMAL;
     float3 cameraPosition : TEXCOORD1;
+    float3 worldPosition : TEXCOORD2;
 };
 
 VSOutput main(VSInput input)
 {
     VSOutput output;
     //output.position = float4(input.position, 1);
-    output.position = mul(float4(input.position, 1), worldMatrix);
-    output.position = mul(output.position, cameraMatrix);
+    output.position = mul(float4(input.position, 1), world);
+    output.worldPosition = output.position.xyz;
     
+    output.position = mul(output.position, camera);
     output.texCoord = input.texCoord;
     
-    // transform local normal to world normal
-    output.normal = normalize(mul(input.normal, (float3x3) worldMatrix));
+    output.normal = normalize(mul(input.normal, (float3x3) world));
     
     output.cameraPosition = cameraPosition;
-    
+
     return output;
 }

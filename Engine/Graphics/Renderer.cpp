@@ -19,7 +19,11 @@ namespace Craft
 
 	Renderer::~Renderer()
 	{
+		// 카메라 버퍼 리소스 해제
 		SafeRelease(cameraBuffer);
+
+		// 라이트 버퍼 리소스 해제
+		SafeRelease(lightBuffer);
 	}
 
 	// 초기화.
@@ -39,6 +43,20 @@ namespace Craft
 		ThrowIfFailed(
 			device.CreateBuffer(&bufferDesc, nullptr, &cameraBuffer),
 			L"Failed to Create Camera Buffer.");
+
+		// 라이트 버퍼 생성을 위한 설명 구조체
+		D3D11_BUFFER_DESC lightBufferDesc = {};
+		lightBufferDesc.ByteWidth = sizeof(LightData);
+		lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		lightBufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+
+		// 라이트 버퍼 생성
+		ThrowIfFailed(
+			device.CreateBuffer(&lightBufferDesc, nullptr, &lightBuffer),
+			L"Failed to create light buffer"
+		);
+
 	}
 
 	void Renderer::Submit(
@@ -55,7 +73,7 @@ namespace Craft
 	}
 
 	void Renderer::UpdateCameraMatrix(
-		const Matrix4& viewMatrix, 
+		const Matrix4& viewMatrix,
 		const Matrix4& projectionMatrix,
 		const Vector3& position)
 	{
@@ -79,6 +97,27 @@ namespace Craft
 		memcpy(resource.pData, &newData, sizeof(CameraData));
 
 		context.Unmap(cameraBuffer, 0);
+	}
+
+	void Renderer::UpdateLightData(const Vector3& position, float intensity, const Vector3& color)
+	{
+		// 라이트 버퍼 업데이트
+		auto& context = GraphicsContext::Get().GetDeviceContext();
+
+		D3D11_MAPPED_SUBRESOURCE resource = {};
+		ThrowIfFailed(context.Map(lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource),
+			L"Failed to map light buffer.");
+
+		// 라이트 데이터
+		LightData newData;
+		newData.position = position;
+		newData.intensity = intensity;
+		newData.color = color;
+
+		// 데이터 업데이트
+		memcpy(resource.pData, &newData, sizeof(LightData));
+
+		context.Unmap(lightBuffer, 0);
 	}
 
 	// DrawCall 발생 처리.
@@ -118,6 +157,9 @@ namespace Craft
 
 			// 카메라 버퍼 바인딩
 			context.VSSetConstantBuffers(1, 1, &cameraBuffer);
+
+			// 라이트 버퍼 바인딩
+			context.PSSetConstantBuffers(0, 1, &lightBuffer);
 
 			// 드로우 콜.
 			// 렌더링 파이프라인 동작.

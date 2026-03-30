@@ -5,6 +5,8 @@ struct VSOutput
     float3 normal : NORMAL;
     float3 cameraPosition : TEXCOORD1;
     float3 worldPosition : TEXCOORD2;
+    float3 tangent : TANGENT;
+    float3 bitangent : BITANGENT;
 };
 
 // light constant buffer.
@@ -33,19 +35,19 @@ float4 main(VSOutput input) : SV_TARGET
     // NdotL.
     float NdotL = dot(worldNormal, -lightDir);
     
-    // Specular (Phong-shader).
+    // Specular ((Vanila)Phong-shader).
     float specular = 0.0f;
     if (NdotL > 0)
     {
         // RdotV.
         // R: reflection vector of light direction vector.
         // V: View-Direction Vector.
-        float3 reflection = reflect(lightDir, worldNormal);
+        //float3 reflection = reflect(lightDir, worldNormal);
         
         // View Direction.
         float3 viewDir = normalize(input.worldPosition - input.cameraPosition);
         
-        // Half-Vector
+        // Half-Vector.
         float3 halfVector = normalize(-lightDir + -viewDir);
 
         // RdotV.
@@ -54,9 +56,10 @@ float4 main(VSOutput input) : SV_TARGET
         float NdotH = saturate(dot(halfVector, worldNormal));
         
         // shineness.
-        float shineness = 16;
+        float shineness = 64;
         
         // specular.
+        //specular = pow(RdotV, shineness);
         specular = pow(NdotH, shineness);
     }
     

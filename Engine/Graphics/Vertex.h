@@ -22,6 +22,12 @@ namespace Craft
 		// ≥Î∏÷ (π˝º±) ∫§≈Õ
 		Vector3 normal;
 
+		// ≈∫¡®∆Æ ∫§≈Õ.
+		Vector3 tangent;
+
+		// πŸ¿Ã≈∫¡®∆Æ(πŸ¿Ã≥Î∏÷) ∫§≈Õ.
+		Vector3 bitangent;
+
 		Vertex(const Vector3& position, const Vector2 texCoord = Vector2::Zero, const Vector3& normal = Vector3::Zero);
 		~Vertex() = default;
 

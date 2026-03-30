@@ -58,6 +58,9 @@ namespace Craft
 		// 렌더 타겟 뷰 생성.
 		void CreateRenderTargetView();
 
+		// 뎁스 스텐실 뷰 생성
+		void CreateDepthStencilView(uint32_t width, uint32_t height);
+
 	private:
 		// 장치류.
 		// Direct3D 리소스는 포인터로만 다룰 수 있음.
@@ -69,6 +72,9 @@ namespace Craft
 		// 리소스.
 		// RTV - 그리기 대상 리소스.
 		ID3D11RenderTargetView* renderTargetView = nullptr;
+
+		// DSV - 뎁스 스텐실 뷰 
+		ID3D11DepthStencilView* depthStencilView = nullptr;
 
 		// 뷰포트.
 		D3D11_VIEWPORT viewport = { };

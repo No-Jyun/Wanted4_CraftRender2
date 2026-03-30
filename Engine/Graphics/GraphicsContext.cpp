@@ -21,6 +21,7 @@ namespace Craft
 		SafeRelease(context);
 		SafeRelease(swapChain);
 		SafeRelease(renderTargetView);
+		SafeRelease(depthStencilView);
 	}
 
 	void GraphicsContext::Initialize(const Win32Window& window)
@@ -41,6 +42,9 @@ namespace Craft
 		// 렌더 타겟 뷰 생성.
 		CreateRenderTargetView();
 
+		// 뎁스 스텐실 뷰 생성
+		CreateDepthStencilView(width, height);
+
 		// @Incomplete: 우리 엔진에서는 뷰포트를 바꿀 필요가 없음.
 		context->RSSetViewports(1, &viewport);
 	}
@@ -52,12 +56,17 @@ namespace Craft
 		// 렌더링 과정을 단순하게: 빈 도화지 준비 -> 그리기 -> 모니터로 전달.
 		
 		// 그릴 도화지 설정.
-		context->OMSetRenderTargets(1, &renderTargetView, nullptr);
+		context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
 		// 빈도화지로 만들기 -> 한 색상으로 덧칠하기.
 		// 사용할 배경색.
 		float backgroundColor[4] = { red, green, blue, 1.0f };
 		context->ClearRenderTargetView(renderTargetView, backgroundColor);
+
+		// 뎁스 스텐실 뷰 초기화
+		context->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+
 	}
 
 	void GraphicsContext::EndScene(uint32_t vsync)
@@ -81,6 +90,9 @@ namespace Craft
 		// 렌더 타겟 뷰 해제
 		SafeRelease(renderTargetView);
 
+		// 뎁스 스텐실 뷰 해체
+		SafeRelease(depthStencilView);
+
 		// 스왑 체인 크기 재조정
 		ThrowIfFailed(
 			swapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0),
@@ -89,6 +101,9 @@ namespace Craft
 
 		// 렌더 타겟 재생성
 		CreateRenderTargetView();
+
+		// 뎁스 스텐실 뷰 재생성
+		CreateDepthStencilView(width, height);
 
 		// 뷰포트 업데이트
 		viewport.Width = static_cast<float>(width);
@@ -271,5 +286,36 @@ namespace Craft
 
 		// 사용한 리소스 해제.
 		SafeRelease(backbuffer);
+	}
+
+	void GraphicsContext::CreateDepthStencilView(uint32_t width, uint32_t height)
+	{
+		// 2차원 텍스처 생성 -> 뎁스 스텐실 뷰 생성
+		D3D11_TEXTURE2D_DESC depthStencilDesc = {};
+		depthStencilDesc.Width = width;
+		depthStencilDesc.Height = height;
+		depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilDesc.ArraySize = 1;
+		depthStencilDesc.MipLevels = 1;
+		depthStencilDesc.SampleDesc.Count = 1;
+		depthStencilDesc.SampleDesc.Quality = 0;
+		depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+		ID3D11Texture2D* depthStencilTexture = nullptr;
+		ThrowIfFailed(
+			device->CreateTexture2D(&depthStencilDesc, nullptr, &depthStencilTexture),
+			L"Failed to create depth stencil texture");
+
+		// 뎁스 스텐실 뷰 생성
+		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
+		depthStencilViewDesc.Format = depthStencilDesc.Format;
+		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+
+		ThrowIfFailed(
+			device->CreateDepthStencilView(depthStencilTexture, &depthStencilViewDesc, &depthStencilView),
+			L"Failed to create depth stencil view");
+
+		// 사용한 리소스 해제
+		SafeRelease(depthStencilTexture);
 	}
 }

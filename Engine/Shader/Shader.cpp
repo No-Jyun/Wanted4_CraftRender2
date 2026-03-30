@@ -10,7 +10,8 @@ namespace Craft
 	{
 		auto& device = GraphicsContext::Get().GetDevice();
 
-		std::wstring vertexShaderPath = std::wstring(L"../CompiledShaders/") + name;
+		std::wstring vertexShaderPath
+			= std::wstring(L"../CompiledShaders/") + name;
 		vertexShaderPath.append(L"VS.cso");
 
 		ID3DBlob* vertexShaderObject = nullptr;
@@ -99,7 +100,9 @@ namespace Craft
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 
 		// 입력 레이아웃 = 정점 셰이더 입력의 명세서.
@@ -126,10 +129,10 @@ namespace Craft
 
 	void Shader::Bind()
 	{
-		// DeviceContext 얻어오기
-		auto& context = GraphicsContext::Get().GetDeviceContext();
+		auto& context
+			= GraphicsContext::Get().GetDeviceContext();
 
-		// 입력 레이아웃 (정점 입력의 명세)
+		// 입력 레이아웃(정점 입력의 명세).
 		context.IASetInputLayout(inputLayout);
 
 		// 셰이더 설정.

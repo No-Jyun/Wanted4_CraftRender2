@@ -20,6 +20,7 @@ cbuffer Light : register(b0)
 
 Texture2D diffuseMap : register(t0);
 Texture2D specularMap : register(t1);
+Texture2D normalMap : register(t2);
 SamplerState mapSampler : register(s0);
 
 float4 main(VSOutput input) : SV_TARGET
@@ -27,12 +28,26 @@ float4 main(VSOutput input) : SV_TARGET
     float4 diffuseMapColor = diffuseMap.Sample(mapSampler, input.texCoord);
     float4 specularMapColor = specularMap.Sample(mapSampler, input.texCoord);
     
+    // tangent normal.
+    float4 tangentNormal = normalMap.Sample(mapSampler, input.texCoord);
+    // !!!!!!!!!.
+    tangentNormal = tangentNormal * 2 - 1;
+    
     // light direction.
     //float3 lightDir = normalize(float3(500.0f, 500.0f, -500.0f));
     float3 lightDir = normalize(input.worldPosition - lightPosition);
     
     // world normal.
-    float3 worldNormal = normalize(input.normal);
+    //float3 worldNormal = normalize(input.normal);
+    // tangent normal to world transformation matrix.
+    float3x3 tangentToWorld = float3x3(
+        normalize(input.tangent),
+        normalize(input.bitangent),
+        normalize(input.normal)
+    );
+    
+    // world normal.
+    float3 worldNormal = normalize(mul(tangentNormal.xyz, tangentToWorld));
     
     // NdotL.
     float NdotL = dot(worldNormal, -lightDir);

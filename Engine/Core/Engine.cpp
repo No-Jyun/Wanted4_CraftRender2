@@ -160,6 +160,12 @@ namespace Craft
 
 		// 창 객체의 변수 값 조정
 		window->SetWidthAndHeight(width, height);
+
+		// 카메라에 전달하기 : 레벨 -> 카메라 액터에 전달
+		if (mainLevel)
+		{
+			mainLevel->OnResize(width, height);
+		}
 	}
 
 	Engine& Engine::Get()
@@ -346,7 +352,7 @@ namespace Craft
 
 		mainLevel->BeginPlay();
 	}
-	
+
 	void Engine::Tick(float deltaTime)
 	{
 		if (!mainLevel)

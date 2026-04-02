@@ -18,6 +18,9 @@ namespace Craft
 		virtual void Tick(float deltaTime);
 		virtual void Draw();
 
+		// 화면 변경 함수 -> 카메라 액터에 이벤트 전달
+		void OnResize(uint32_t width, uint32_t height);
+
 		void ProcessAddAndDestroyActors();
 
 		inline bool HasInitialized() { return hasInitialized; }

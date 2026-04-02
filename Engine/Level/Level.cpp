@@ -1,5 +1,6 @@
 #include "Level.h"
 #include "Actor/Actor.h"
+#include "Actor/CameraActor.h"
 
 namespace Craft
 {
@@ -52,6 +53,20 @@ namespace Craft
 			}
 
 			actor->Draw();
+		}
+	}
+
+	void Level::OnResize(uint32_t width, uint32_t height)
+	{
+		// 카메라 액터 찾아서 너비 / 높이 값 전달
+		for (const std::shared_ptr<Actor>& actor : actorList)
+		{
+			// 형변환 시도 및 성공 시 이벤트 전달
+			if (auto camera = std::dynamic_pointer_cast<CameraActor>(actor))
+			{
+				camera->OnResize(width, height);
+				break;
+			}
 		}
 	}
 

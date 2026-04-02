@@ -16,6 +16,9 @@ namespace Craft
 
 		virtual ~CameraActor();
 
+		// 화면 크기 변경 함수
+		void OnResize(uint32_t width, uint32_t height);
+
 	protected:
 		virtual void Tick(float deltaTime) override;
 		virtual void Draw() override;

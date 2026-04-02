@@ -54,16 +54,16 @@ float4 main(VSOutput input) : SV_TARGET
     
     // Specular ((Vanila)Phong-shader).
     float3 specular = 0.0f;
+        
+    // View Direction.
+    float3 viewDir = normalize(input.worldPosition - input.cameraPosition);
+        
     if (NdotL > 0)
     {
         // RdotV.
         // R: reflection vector of light direction vector.
         // V: View-Direction Vector.
         //float3 reflection = reflect(lightDir, worldNormal);
-        
-        // View Direction.
-        float3 viewDir = normalize(input.worldPosition - input.cameraPosition);
-        
         // Half-Vector.
         float3 halfVector = normalize(-lightDir + -viewDir);
 
@@ -80,6 +80,16 @@ float4 main(VSOutput input) : SV_TARGET
         specular = specularMapColor.rgb * pow(NdotH, shineness);
     }
     
+    // Rim Lighting
+    float NdotV = saturate(dot(worldNormal, -viewDir));
+    float rimAmount = 0.8f;
+    float rimConstant = 2.0f;   // control rim effect smoothness
+    float rimWidth = 0.2f;
+    
+    // rim intensity
+    float rimIntensity = smoothstep(rimAmount - rimWidth, rimAmount + rimWidth, 1 - NdotV);
+    rimIntensity = pow(rimIntensity, rimConstant) * saturate(NdotL);
+    
     // Diffuse + Specular + Ambient(Global-Illumination/Local-Illumination).
     
     // final color.
@@ -93,7 +103,7 @@ float4 main(VSOutput input) : SV_TARGET
     // Specular.
     float4 specularColor = float4(specular, 1) * float4(lightColor, 1);
     
-    finalColor = diffuse + specularColor;
+    finalColor = diffuse + specularColor + float4(float3(1.0f, 0.0f, 0.0f) * rimIntensity, 1.0f);
     
     //return float4(1.0f, 1.0f, 0.0f, 1.0f);
     //return diffuseMapColor * NdotL;

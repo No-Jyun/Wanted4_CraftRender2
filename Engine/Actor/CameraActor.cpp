@@ -10,8 +10,8 @@ namespace Craft
 		float nearDistance,
 		float farDistance)
 		: fieldOfView(fieldOfView), 
-		width(Engine::Get().GetWidth()),
-		height(Engine::Get().GetHeight()),
+		width(static_cast<float>(Engine::Get().GetWidth())),
+		height(static_cast<float>(Engine::Get().GetHeight())),
 		nearDistance(nearDistance),
 		farDistance(farDistance)
 	{
@@ -37,6 +37,18 @@ namespace Craft
 
 	CameraActor::~CameraActor()
 	{
+	}
+
+	void CameraActor::OnResize(uint32_t width, uint32_t height)
+	{
+		// 투영 변환 행렬 업데이트
+		projectionMatrix = Matrix4::Perspective(
+			fieldOfView,
+			static_cast<float>(width),
+			static_cast<float>(height),
+			nearDistance,
+			farDistance
+		);
 	}
 
 	void CameraActor::Tick(float deltaTime)

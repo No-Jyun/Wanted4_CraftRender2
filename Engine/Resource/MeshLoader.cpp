@@ -1,4 +1,5 @@
 #include "MeshLoader.h"
+#include "Core/Common.h"
 #include "Graphics/StaticMesh.h"
 
 #include "Graphics/Vertex.h"
@@ -8,9 +9,18 @@
 #include <fstream>
 #include <sstream>
 
+// ASSIMP
+#include <Importer.hpp>
+#include <scene.h>
+#include <postprocess.h>
+#include <cimport.h>
+
 namespace Craft
 {
 	MeshLoader* MeshLoader::instance = nullptr;
+
+	// FBX 메시 처리 함수
+	void ProcessMesh(aiMesh* mesh, std::shared_ptr<StaticMesh>& outMesh);	
 
 	MeshLoader::MeshLoader()
 	{
@@ -30,8 +40,27 @@ namespace Craft
 			return;
 		}
 
-		// 없는 경우에는 로드해서 반환.
-		LoadOBJ(name, outMesh);
+		// 포맷 구분 (파일의 확장자 기반으로)
+		auto index = name.find_last_of(".");
+		// 확장자만 자르기
+		std::string extension = name.substr(index + 1);
+
+		// OBJ / FBX 구분 처리
+		if (extension == "obj" || extension == "OBJ")
+		{
+			// 없는 경우에는 로드해서 반환.
+			LoadOBJ(name, outMesh);
+		}
+		else if (extension == "fbx" || extension == "FBX")
+		{
+			// 없는 경우에는 로드해서 반환.
+			LoadFBX(name, outMesh);
+		}
+		else
+		{
+			// 예외처리
+			ThrowIfFailed(E_FAIL, L"Craft engine only supports obj or fbx format");
+		}
 	}
 
 	void MeshLoader::LoadOBJ(
@@ -149,19 +178,111 @@ namespace Craft
 		}
 
 		std::shared_ptr<StaticMesh> newMesh = std::make_shared<StaticMesh>();
-		newMesh->Initialize(
-			vertices.data(), vertexCount, Vertex::Stride(),
-			indices.data(), static_cast<uint32_t>(indices.size())
-		);
+		//newMesh->Initialize(
+		//	vertices.data(), vertexCount, Vertex::Stride(),
+		//	indices.data(), static_cast<uint32_t>(indices.size())
+		//);
+
+		newMesh->AddSubMesh(vertices, indices);
 
 		outMesh = newMesh;
 		meshList.insert({ name, newMesh });
 		file.close();
 	}
 
+	void MeshLoader::LoadFBX(const std::string& name, std::shared_ptr<StaticMesh>& outMesh)
+	{
+		std::string path = std::string("../Assets/Meshes/") + name;
+		
+		// fbx scene 열기
+		const aiScene* scene = aiImportFile(path.c_str(), aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
+
+		// 확인 (메시가 있는지 확인)
+		if (!scene || scene->HasMeshes())
+		{
+			ThrowIfFailed(E_FAIL, L"Failed to open fbx file or fbx has no mesh");
+			return;
+		}
+
+		// 서브 메쉬 순환하면서 처리 진행
+		for (uint32_t ix = 0; ix < scene->mNumMeshes; ix++)
+		{
+			ProcessMesh(scene->mMeshes[ix], outMesh);
+		}
+
+		// 해제
+		aiReleaseImport(scene);
+	}
+
 	MeshLoader& MeshLoader::Get()
 	{
 		assert(instance);
 		return *instance;
+	}
+
+	void ProcessMesh(aiMesh* mesh, std::shared_ptr<StaticMesh>& outMesh)
+	{
+		std::vector<Vertex> vertices;
+		vertices.reserve(static_cast<uint32_t>(mesh->mNumVertices));
+		for (uint32_t ix = 0; ix < mesh->mNumVertices; ++ix)
+		{
+			const aiVector3D& aiVertex = mesh->mVertices[ix];
+			Vector3 position(aiVertex.x, aiVertex.y, aiVertex.z);
+
+			Vector2 texCoord;
+			if (mesh->HasTextureCoords(0))
+			{
+				const aiVector3D& aiTexCoord = mesh->mTextureCoords[0][ix];
+				texCoord.x = aiTexCoord.x;
+				texCoord.y = aiTexCoord.y;
+			}
+
+			Vector3 normal;
+			if (mesh->HasNormals())
+			{
+				const aiVector3D& aiNormal = mesh->mNormals[ix];
+				normal.x = aiNormal.x;
+				normal.y = aiNormal.y;
+				normal.z = aiNormal.z;
+			}
+
+			Vector3 tangent;
+			Vector3 bitangent;
+			if (mesh->HasTangentsAndBitangents())
+			{
+				const aiVector3D& aiTangent = mesh->mTangents[ix];
+				const aiVector3D& aiBitangent = mesh->mBitangents[ix];
+
+				tangent.x = aiTangent.x;
+				tangent.y = aiTangent.y;
+				tangent.z = aiTangent.z;
+
+				bitangent.x = aiBitangent.x;
+				bitangent.y = aiBitangent.y;
+				bitangent.z = aiBitangent.z;
+			}
+			// 탄젠트, 바이 탄젠트가 없다면 노멀 매핑이 안됨
+			// 따라서 위 항목은 반드시 있어야함.
+			// 그래서 만약에 없다면 LoadOBJ에서 한 작업 해야함
+
+			Vertex vertex(position, texCoord, normal);
+			vertex.tangent = tangent;
+			vertex.bitangent = bitangent;
+
+			vertices.emplace_back(vertex);
+		}
+
+		std::vector<uint32_t> indices;
+		indices.reserve(mesh->mNumFaces * 3);
+		for (uint32_t ix = 0; ix < mesh->mNumFaces; ++ix)
+		{
+			const aiFace& face = mesh->mFaces[ix];
+
+			indices.emplace_back(face.mIndices[0]);
+			indices.emplace_back(face.mIndices[1]);
+			indices.emplace_back(face.mIndices[2]);
+		}
+
+		outMesh->AddSubMesh(vertices, indices);
 	}
 }

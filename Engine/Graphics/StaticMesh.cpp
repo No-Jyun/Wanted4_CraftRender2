@@ -51,6 +51,20 @@ namespace Craft
 
 	SubMesh::~SubMesh()
 	{
+		SafeRelease(vertexBuffer);
+		SafeRelease(indexBuffer);
+	}
+
+	void SubMesh::Bind()
+	{
+		// DeviceContext 얻어오기
+		auto& context = GraphicsContext::Get().GetDeviceContext();
+
+		uint32_t offset = 0;
+		context.IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+		context.IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+		context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 
 	// -------------------- SubMesh --------------------
@@ -61,57 +75,17 @@ namespace Craft
 
 	StaticMesh::~StaticMesh()
 	{
-		SafeRelease(vertexBuffer);
-		SafeRelease(indexBuffer);
 	}
 
-	void StaticMesh::Initialize(
-		const void* vertices, uint32_t vertexCount, uint32_t stride, 
-		const void* indices, uint32_t indexCount)
+	void StaticMesh::AddSubMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
 	{
-		// @Test: 멤버 변수에 정점 버퍼 저장
-		this->vertices.reserve(vertexCount);
-		Vertex* vertexArray = (Vertex*)(vertices);
-		for (uint32_t i = 0; i < vertexCount; i++)
-		{
-			this->vertices.emplace_back(vertexArray[i]);
-		}
+		submeshList.emplace_back(std::make_shared<SubMesh>(vertices, indices));
+	}
 
+	void StaticMesh::Bind(uint32_t index)
+	{
 		
-	}
-
-	void StaticMesh::UpdateVertexBuffer(const std::vector<Vertex>& vertices)
-	{
-		// 예외처리
-		if (!vertexBuffer || vertices.empty())
-		{
-			return;
-		}
-
-		// 업데이트 (CPU -> GPU)
-		auto& context = GraphicsContext::Get().GetDeviceContext();
-		context.UpdateSubresource(
-			vertexBuffer,
-			0,
-			nullptr,
-			vertices.data(),
-			0,
-			0
-		);
-
-		GetLastError();
-	}
-
-	void StaticMesh::Bind()
-	{
-		// DeviceContext 얻어오기
-		auto& context = GraphicsContext::Get().GetDeviceContext();
-
-		uint32_t offset = 0;
-		context.IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-		context.IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-		context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		
 	}
 }
 

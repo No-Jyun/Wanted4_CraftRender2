@@ -23,7 +23,7 @@ namespace Craft
 
 	private:
 		// 메시 로드 함수
-		void LoadMesh(const std::string& name, std::weak_ptr<StaticMesh>& outMesh);
+		void LoadOBJ(const std::string& name, std::weak_ptr<StaticMesh>& outMesh);
 
 	private:
 		// 맵 (메시 관리 컨테이너)

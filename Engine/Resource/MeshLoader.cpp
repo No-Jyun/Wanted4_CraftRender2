@@ -31,10 +31,10 @@ namespace Craft
 		}
 
 		// 없는 경우에는 로드해서 반환.
-		LoadMesh(name, outMesh);
+		LoadOBJ(name, outMesh);
 	}
 
-	void MeshLoader::LoadMesh(
+	void MeshLoader::LoadOBJ(
 		const std::string& name,
 		std::weak_ptr<StaticMesh>& outMesh)
 	{

@@ -8,6 +8,27 @@
 
 namespace Craft
 {
+	// 서브 메시 구조체
+	struct CRAFT_API SubMesh
+	{
+		SubMesh();
+		SubMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
+		~SubMesh();
+
+		// 셰이더 바인딩 함수
+		void Bind();
+
+		// 인덱스 수 반환 함수
+		inline uint32_t GetIndexCount() const { return static_cast<uint32_t>(indices.size()); }
+
+		std::vector<Vertex> vertices;
+		uint32_t stride = 0;
+		ID3D11Buffer* vertexBuffer = nullptr;
+
+		std::vector<uint32_t> indices;
+		ID3D11Buffer* indexBuffer = nullptr;
+	};
+
 	class CRAFT_API StaticMesh
 	{
 	public:

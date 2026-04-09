@@ -4,6 +4,57 @@
 
 namespace Craft
 {
+	SubMesh::SubMesh()
+	{
+	}
+
+	SubMesh::SubMesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
+		: stride(Vertex::Stride())
+	{
+		// 배열 복사
+		this->vertices.assign(vertices.begin(), vertices.end());
+		this->indices.assign(indices.begin(), indices.end());
+
+		auto& device = GraphicsContext::Get().GetDevice();
+
+		D3D11_BUFFER_DESC vertexBufferDesc = {};
+		vertexBufferDesc.ByteWidth = stride * (uint32_t)vertices.size();
+		vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+		D3D11_SUBRESOURCE_DATA vertexData = {};
+		vertexData.pSysMem = this->vertices.data();
+
+		// 정점 버퍼 생성
+		ThrowIfFailed(device.CreateBuffer(
+			&vertexBufferDesc,
+			&vertexData,
+			&vertexBuffer
+		), L"Failed to create vertex buffer");
+
+		D3D11_BUFFER_DESC indexBufferDesc = {};
+		indexBufferDesc.ByteWidth = sizeof(uint32_t) * (uint32_t)indices.size();
+		indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+		// 서브 리소스 데이터 설정 (실제 데이터 할당).
+		D3D11_SUBRESOURCE_DATA indexData = { };
+		indexData.pSysMem = this->indices.data();
+
+		// 인덱스 버퍼 생성.
+		ThrowIfFailed(device.CreateBuffer(
+			&indexBufferDesc,
+			&indexData,
+			&indexBuffer
+		), L"Failed to create index buffer");
+	}
+
+	SubMesh::~SubMesh()
+	{
+	}
+
+	// -------------------- SubMesh --------------------
+
 	StaticMesh::StaticMesh()
 	{	
 	}
@@ -26,54 +77,7 @@ namespace Craft
 			this->vertices.emplace_back(vertexArray[i]);
 		}
 
-		auto& device = GraphicsContext::Get().GetDevice();
-
-		this->stride = stride;
-		this->indexCount = indexCount;
-
-		D3D11_BUFFER_DESC vertexBufferDesc = {};
-		vertexBufferDesc.ByteWidth = stride * vertexCount;
-		vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-		D3D11_SUBRESOURCE_DATA vertexData = {};
-		vertexData.pSysMem = vertices;
-
-		vertexBuffer = nullptr;
-		HRESULT result = device.CreateBuffer(
-			&vertexBufferDesc,
-			&vertexData,
-			&vertexBuffer
-		);
-
-		if (FAILED(result))
-		{
-			__debugbreak();
-			return;
-		}
-
-		D3D11_BUFFER_DESC indexBufferDesc = {};
-		indexBufferDesc.ByteWidth = sizeof(uint32_t) * indexCount;
-		indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-		indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-		// 서브 리소스 데이터 설정 (실제 데이터 할당).
-		D3D11_SUBRESOURCE_DATA indexData = { };
-		indexData.pSysMem = indices;
-
-		// 인덱스 버퍼 생성.
-		indexBuffer = nullptr;
-		result = device.CreateBuffer(
-			&indexBufferDesc,
-			&indexData,
-			&indexBuffer
-		);
-
-		if (FAILED(result))
-		{
-			__debugbreak();
-			return;
-		}
+		
 	}
 
 	void StaticMesh::UpdateVertexBuffer(const std::vector<Vertex>& vertices)

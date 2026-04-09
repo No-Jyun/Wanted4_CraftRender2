@@ -53,8 +53,13 @@ namespace Craft
 		}
 		else if (extension == "fbx" || extension == "FBX")
 		{
+			std::shared_ptr<StaticMesh> newMesh = std::make_shared<StaticMesh>();
+
 			// 없는 경우에는 로드해서 반환.
-			LoadFBX(name, outMesh);
+			LoadFBX(name, newMesh);
+
+			// 출력
+			outMesh = newMesh;
 		}
 		else
 		{
@@ -198,8 +203,13 @@ namespace Craft
 		const aiScene* scene = aiImportFile(path.c_str(), aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
 
 		// 확인 (메시가 있는지 확인)
-		if (!scene || scene->HasMeshes())
+		if (!scene || !scene->HasMeshes())
 		{
+			if (!scene->HasMeshes())
+			{
+				aiReleaseImport(scene);
+			}
+
 			ThrowIfFailed(E_FAIL, L"Failed to open fbx file or fbx has no mesh");
 			return;
 		}
@@ -209,6 +219,9 @@ namespace Craft
 		{
 			ProcessMesh(scene->mMeshes[ix], outMesh);
 		}
+
+		// 맵에 저장
+		meshList.insert({ name, outMesh });
 
 		// 해제
 		aiReleaseImport(scene);

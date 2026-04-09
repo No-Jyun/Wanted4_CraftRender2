@@ -5,5 +5,5 @@
 TriangleMeshActor::TriangleMeshActor()
 {
 	mesh = std::make_shared<TriangleMesh>();
-	shader = std::make_shared<Craft::Shader>(L"Default");
+	shaderList.emplace_back(std::make_shared<Craft::Shader>(L"Default"));
 }

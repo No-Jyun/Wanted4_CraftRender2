@@ -58,6 +58,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\Includes\Engine\;$(ProjectDir)\;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -66,7 +67,8 @@
       <AdditionalLibraryDirectories>..\Library\Engine\$(Configuration)\;</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy ..\Library\Engine\$(Configuration)\Engine.dll $(OutDir)\ /e /y /i</Command>
+      <Command>xcopy ..\Library\Engine\$(Configuration)\Engine.dll $(OutDir)\ /e /y /i
+xcopy ..\Library\Assimp\$(Configuration)\*.dll $(OutDir)\ /e /y /i</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>xcopy ..\CompiledShaders\*.cso $(OutDir)..\CompiledShaders\ /e /y /i</Command>
@@ -81,6 +83,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>..\Includes\Engine\;$(ProjectDir)\;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -89,7 +92,8 @@
       <AdditionalLibraryDirectories>..\Library\Engine\$(Configuration)\;</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy ..\Library\Engine\$(Configuration)\Engine.dll $(OutDir)\ /e /y /i</Command>
+      <Command>xcopy ..\Library\Engine\$(Configuration)\Engine.dll $(OutDir)\ /e /y /i
+xcopy ..\Library\Assimp\$(Configuration)\*.dll $(OutDir)\ /e /y /i</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>xcopy ..\CompiledShaders\*.cso $(OutDir)..\CompiledShaders\ /e /y /i</Command>
@@ -97,7 +101,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Actor\CameraMovementActor.cpp" />
+    <ClCompile Include="Actor\Freddy.cpp" />
     <ClCompile Include="Actor\QuadMeshActor.cpp" />
+    <ClCompile Include="Actor\WarriorCharacter.cpp" />
     <ClCompile Include="Level\TriangleDemoLevel.cpp" />
     <ClCompile Include="Mesh\TriangleMesh.cpp" />
     <ClCompile Include="Actor\TriangleMeshActor.cpp" />
@@ -105,7 +111,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor\CameraMovementActor.h" />
+    <ClInclude Include="Actor\Freddy.h" />
     <ClInclude Include="Actor\QuadMeshActor.h" />
+    <ClInclude Include="Actor\WarriorCharacter.h" />
     <ClInclude Include="Level\TriangleDemoLevel.h" />
     <ClInclude Include="Mesh\TriangleMesh.h" />
     <ClInclude Include="Actor\TriangleMeshActor.h" />

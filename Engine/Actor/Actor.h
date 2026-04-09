@@ -2,6 +2,7 @@
 
 #include "Core/Common.h"
 #include <memory>
+#include <vector>
 
 namespace Craft
 {
@@ -39,7 +40,7 @@ namespace Craft
 		bool hasExpired = false;
 
 		std::weak_ptr<StaticMesh> mesh;
-		std::shared_ptr<Shader> shader;
+		std::vector<std::shared_ptr<Shader>> shaderList;
 		std::weak_ptr<Level> owner;
 	};
 }

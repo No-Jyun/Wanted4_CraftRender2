@@ -10,11 +10,12 @@ namespace Craft
 	class StaticMesh;
 	class Shader;
 	class Transform;
+	struct SubMesh;
 
 	// 렌더 명령(RenderCommand).
 	struct RenderCommand
 	{
-		std::shared_ptr<StaticMesh> mesh;
+		std::shared_ptr<SubMesh> mesh;
 		std::shared_ptr<Shader> shader;
 		std::shared_ptr<Transform> transform;
 	};
@@ -54,7 +55,7 @@ namespace Craft
 
 		// 그리는데 필요한 정보 제출.
 		void Submit(
-			std::shared_ptr<StaticMesh> mesh,
+			std::shared_ptr<SubMesh> mesh,
 			std::shared_ptr<Shader> shader,
 			std::shared_ptr<Transform> transform
 		);

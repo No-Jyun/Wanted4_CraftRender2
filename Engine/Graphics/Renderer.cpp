@@ -60,7 +60,7 @@ namespace Craft
 	}
 
 	void Renderer::Submit(
-		std::shared_ptr<StaticMesh> mesh,
+		std::shared_ptr<SubMesh> mesh,
 		std::shared_ptr<Shader> shader,
 		std::shared_ptr<Transform> transform)
 	{

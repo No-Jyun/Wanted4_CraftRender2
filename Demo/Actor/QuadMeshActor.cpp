@@ -7,6 +7,7 @@
 #include "Shader/NormalMappingShader.h"
 
 #include "Texture/Texture.h"
+#include "Texture/RenderTexture.h"
 #include "Resource/TextureLoader.h"
 
 #include "Math/Matrix4.h"
@@ -17,24 +18,28 @@ using namespace Craft;
 
 QuadMeshActor::QuadMeshActor()
 {
+	isUsingRenderTexture = true;
+
 	// 메시 로드 요청
-	MeshLoader::Get().GetMesh("Sphere.obj", mesh);
+	MeshLoader::Get().GetMesh("Quad.obj", mesh);
 
 	// 셰이더 생성
 	//shader = std::make_shared<Shader>(L"Default");
 	//std::shared_ptr<TextureMappingShader> textureMappingShader = std::make_shared<TextureMappingShader>("T_coord.png");
 	//shader = std::make_shared<SpecularMappingShader>("2k_earth_daymap.jpg", "2k_earth_specular_map.jpg");
 
-	// 왜 됨? UpCasting
-	shaderList.emplace_back(std::make_shared<NormalMappingShader>(
-		"2k_earth_daymap.jpg", "2k_earth_specular_map.jpg", "2k_earth_normal_map.jpg"
-	));
+	// 셰이더 객체 생성
+	std::shared_ptr<TextureMappingShader> shader = std::make_shared<TextureMappingShader>();
 
-	// @Test: 텍스처 로드 테스트
-	//std::shared_ptr<Texture> texture = std::make_shared<Texture>("T_coord.png");
+	// 렌더 텍스처 로드
+	std::weak_ptr<RenderTexture> texture;
+	TextureLoader::Get().GetNewRenderTexture(texture, 1280, 800);
 
-	//std::weak_ptr<Texture> texture;
-	//TextureLoader::Get().Load("T_coord.png", texture);
+	// 셰이더에 렌더 텍스처 설정
+	shader->SetTexture(texture);
+
+	// 액터 셰이더 목록에 추가	
+	shaderList.emplace_back(shader);
 }
 
 void QuadMeshActor::Tick(float deltaTime)

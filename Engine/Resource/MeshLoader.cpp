@@ -205,7 +205,7 @@ namespace Craft
 		// 확인 (메시가 있는지 확인)
 		if (!scene || !scene->HasMeshes())
 		{
-			if (!scene->HasMeshes())
+			if (scene && !scene->HasMeshes())
 			{
 				aiReleaseImport(scene);
 			}

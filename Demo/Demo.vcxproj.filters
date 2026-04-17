@@ -24,19 +24,16 @@
     <ClCompile Include="Mesh\TriangleMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\TriangleMeshActor.cpp">
+    <ClCompile Include="Actor\CameraMovementActor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Actor\QuadMeshActor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Actor\CameraMovementActor.cpp">
+    <ClCompile Include="Actor\TriangleMeshActor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Actor\WarriorCharacter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Actor\Freddy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,20 +44,17 @@
     <ClInclude Include="Mesh\TriangleMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\TriangleMeshActor.h">
+    <ClInclude Include="Actor\CameraMovementActor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Actor\QuadMeshActor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\CameraMovementActor.h">
+    <ClInclude Include="Actor\TriangleMeshActor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Actor\WarriorCharacter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Actor\Freddy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
-</Project>
+</Project>t>

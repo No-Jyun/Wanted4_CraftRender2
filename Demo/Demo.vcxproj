@@ -101,22 +101,20 @@ xcopy ..\Library\Assimp\$(Configuration)\*.dll $(OutDir)\ /e /y /i</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Actor\CameraMovementActor.cpp" />
-    <ClCompile Include="Actor\Freddy.cpp" />
     <ClCompile Include="Actor\QuadMeshActor.cpp" />
+    <ClCompile Include="Actor\TriangleMeshActor.cpp" />
     <ClCompile Include="Actor\WarriorCharacter.cpp" />
     <ClCompile Include="Level\TriangleDemoLevel.cpp" />
     <ClCompile Include="Mesh\TriangleMesh.cpp" />
-    <ClCompile Include="Actor\TriangleMeshActor.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor\CameraMovementActor.h" />
-    <ClInclude Include="Actor\Freddy.h" />
     <ClInclude Include="Actor\QuadMeshActor.h" />
+    <ClInclude Include="Actor\TriangleMeshActor.h" />
     <ClInclude Include="Actor\WarriorCharacter.h" />
     <ClInclude Include="Level\TriangleDemoLevel.h" />
     <ClInclude Include="Mesh\TriangleMesh.h" />
-    <ClInclude Include="Actor\TriangleMeshActor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

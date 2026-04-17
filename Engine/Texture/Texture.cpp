@@ -9,118 +9,12 @@ namespace Craft
 	Texture::Texture(const std::string& name, BindType bindType)
 		: name(name), bindType(bindType)
 	{
-		// 데이터 객체 생성
-		data = std::make_unique<TextureData>();
-
-		// 이미지 로드 (stb_image 라이브러리 활용)
-
-		// 이미지 애셋 경로
-		std::string path = std::string("../Assets/Textures/") + name;
-
-		data->pixelArray = stbi_load(
-			path.c_str(),
-			&data->width,
-			&data->height,
-			&data->channelCount,
-			0
-		);
-
-		// 24비트 (채널 수 3개) 텍스처인 경우 32비트로 변환
-		if (data->channelCount == 3)
-		{
-			ConvertToRGBA(data);
-		}
-
-		// 예외처리
-		if (!data->pixelArray)
-		{
-			__debugbreak();
-			return;
-		}
-
-		// 셰이더 리소스 생성
-		auto& device = GraphicsContext::Get().GetDevice();
-
-		D3D11_TEXTURE2D_DESC textureDesc = {};
-		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		textureDesc.ArraySize = 1;
-		textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		textureDesc.Width = data->width;
-		textureDesc.Height = data->height;
-		textureDesc.SampleDesc.Count = 1;
-		textureDesc.SampleDesc.Quality = 0;
-		textureDesc.MipLevels = 1;
-
-		// 이미지에서 로드한 픽셀 정보 설정
-		D3D11_SUBRESOURCE_DATA textureData = {};
-		textureData.pSysMem = data->pixelArray;
-		textureData.SysMemPitch = data->width * data->channelCount;
-
-		ID3D11Texture2D* texture = nullptr;
-		HRESULT result = device.CreateTexture2D(
-			&textureDesc,
-			&textureData,
-			&texture
-		);
-
-		if (FAILED(result))
-		{
-			__debugbreak();
-			return;
-		}
-
-		result = device.CreateShaderResourceView(
-			texture,
-			nullptr,
-			&shaderResouceView
-		);
-
-		if (FAILED(result))
-		{
-			__debugbreak();
-			return;
-		}
-
-		SafeRelease(texture);
-
-		// 샘플러 생성
-		/*
-		    D3D11_FILTER Filter;
-		    D3D11_TEXTURE_ADDRESS_MODE AddressU;
-		    D3D11_TEXTURE_ADDRESS_MODE AddressV;
-		    D3D11_TEXTURE_ADDRESS_MODE AddressW;
-		    FLOAT MipLODBias;
-		    UINT MaxAnisotropy;
-		    D3D11_COMPARISON_FUNC ComparisonFunc;
-		    FLOAT BorderColor[ 4 ];
-		    FLOAT MinLOD;
-		    FLOAT MaxLOD;
-		*/
-		D3D11_SAMPLER_DESC samplerDesc = {};
-		samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.MaxAnisotropy = 3;
-		samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-		samplerDesc.MinLOD = -FLT_MAX;
-		samplerDesc.MaxLOD = FLT_MAX;
-
-		result = device.CreateSamplerState(
-			&samplerDesc,
-			&samplerState
-		);
-
-		if (FAILED(result))
-		{
-			__debugbreak();
-			return;
-		}
+		LoadTexture(name);
 	}
 
 	Texture::~Texture()
 	{
-		SafeRelease(shaderResouceView);
+		SafeRelease(shaderResourceView);
 		SafeRelease(samplerState);
 	}
 
@@ -131,7 +25,7 @@ namespace Craft
 		if (bindType == BindType::VertexShader)
 		{
 			// 셰이더 단계에 바인딩
-			context.VSSetShaderResources(index, 1, &shaderResouceView);
+			context.VSSetShaderResources(index, 1, &shaderResourceView);
 
 			// 샘플러 바인딩
 			context.VSSetSamplers(index, 1, &samplerState);
@@ -139,7 +33,7 @@ namespace Craft
 		else if (bindType == BindType::PixelShader)
 		{
 			// 셰이더 단계에 바인딩
-			context.PSSetShaderResources(index, 1, &shaderResouceView);
+			context.PSSetShaderResources(index, 1, &shaderResourceView);
 
 			// 샘플러 바인딩
 			context.PSSetSamplers(index, 1, &samplerState);
@@ -172,7 +66,7 @@ namespace Craft
 		for (uint32_t ix = 0; ix < pixelCount; ix++)
 		{
 			// 메모리 복사 (3바이트 만큼만 복사)
-			memcpy(dest, source, sizeof(uint32_t) * 3);
+			memcpy(dest, source, sizeof(uint8_t) * 3);
 
 			//dest[0] = source[0];
 			//dest[1] = source[1];
@@ -195,5 +89,92 @@ namespace Craft
 		// 새로 생성한 이미지 데이터로 설정
 		textureData->pixelArray = imageBuffer;
 		textureData->channelCount = 4;
+	}
+
+	void Texture::LoadTexture(const std::string& name)
+	{
+		// 데이터 객체 생성.
+		data = std::make_unique<TextureData>();
+
+		// 이미지 로드(stb_image 라이브러리 활용).
+
+		// 이미지 애셋 경로.
+		std::string path
+			= std::string("../Assets/Textures/") + name;
+
+		data->pixelArray = stbi_load(
+			path.c_str(),
+			&data->width,
+			&data->height,
+			&data->channelCount,
+			0
+		);
+
+		// 24비트(채널 수 3개) 텍스처인 경우 32비트로 변환.
+		if (data->channelCount == 3)
+		{
+			ConvertToRGBA(data);
+		}
+
+		// 예외 처리.
+		if (!data->pixelArray)
+		{
+			__debugbreak();
+			return;
+		}
+
+		// SRV 및 Sampler 생성.
+		CreateSRVAndSampler();
+	}
+
+	void Texture::CreateSRVAndSampler()
+	{
+		// 셰이더 리소스 생성.
+		auto& device = GraphicsContext::Get().GetDevice();
+
+		D3D11_TEXTURE2D_DESC textureDesc = {};
+		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		textureDesc.ArraySize = 1;
+		textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		textureDesc.Width = data->width;
+		textureDesc.Height = data->height;
+		textureDesc.SampleDesc.Count = 1;
+		textureDesc.SampleDesc.Quality = 0;
+		textureDesc.MipLevels = 1;
+
+		// 이미지에서 로드한 픽셀 정보 설정.
+		D3D11_SUBRESOURCE_DATA textureData = {};
+		textureData.pSysMem = data->pixelArray;
+		textureData.SysMemPitch = data->width * data->channelCount;
+
+		ID3D11Texture2D* texture = nullptr;
+		ThrowIfFailed(device.CreateTexture2D(
+			&textureDesc,
+			&textureData,
+			&texture
+		), L"Failed to create texture2d.");
+
+		ThrowIfFailed(device.CreateShaderResourceView(
+			texture,
+			nullptr,
+			&shaderResourceView
+		), L"Failed to create shader resource view.");
+
+		SafeRelease(texture);
+
+		D3D11_SAMPLER_DESC samplerDesc = {};
+		samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.MaxAnisotropy = 3;
+		samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+		samplerDesc.MinLOD = -FLT_MAX;
+		samplerDesc.MaxLOD = FLT_MAX;
+
+		ThrowIfFailed(device.CreateSamplerState(
+			&samplerDesc,
+			&samplerState
+		), L"Failed to create sampler state");
 	}
 }

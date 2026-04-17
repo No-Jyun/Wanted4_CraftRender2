@@ -81,6 +81,18 @@
     <ClCompile Include="Shader\NormalMappingShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture\CubemapTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\CubemapShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor\SkyboxActor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\RenderTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Win32Window.h">
@@ -155,6 +167,18 @@
     <ClInclude Include="Shader\NormalMappingShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Texture\CubemapTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\CubemapShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor\SkyboxActor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\RenderTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="HLSLShader\DefaultVS.hlsl" />
@@ -165,5 +189,7 @@
     <FxCompile Include="HLSLShader\SpecularMappingPS.hlsl" />
     <FxCompile Include="HLSLShader\NormalMappingPS.hlsl" />
     <FxCompile Include="HLSLShader\NormalMappingVS.hlsl" />
+    <FxCompile Include="HLSLShader\CubemapVS.hlsl" />
+    <FxCompile Include="HLSLShader\CubemapPS.hlsl" />
   </ItemGroup>
 </Project>

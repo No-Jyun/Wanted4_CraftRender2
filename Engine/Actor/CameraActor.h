@@ -12,7 +12,7 @@ namespace Craft
 		CameraActor(
 			float fieldOfView = 60.0f,
 			float nearDistance = 0.1f,
-			float farDistance = 1000.0f);
+			float farDistance = 100000.0f);
 
 		virtual ~CameraActor();
 

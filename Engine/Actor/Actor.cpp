@@ -22,32 +22,39 @@ namespace Craft
 
 	void Actor::Tick(float deltaTime)
 	{
-		// 트랜스폼 업데이트
+		// 트랜스폼 업데이트.
 		transform->Update();
 	}
 
 	void Actor::Draw()
 	{
-		// @Incomplete: 예외처리
+		// @Incomplete: 예외처리.
 		if (!mesh.lock())
 		{
-			// 일단 조용히 반환
-			// silence is violent
+			// 일단 조용히 반환.
+			// Silence is violent.
 			return;
 		}
 
-		// 서브 메시 모두 제출
-		const uint32_t subMeshCount = mesh.lock()->GetSubMeshCount();
-		
-		// 예외처리
+		// 서브 메시 모두 제출.
+		const uint32_t subMeshCount
+			= mesh.lock()->GetSubMeshCount();
+
+		// 예외처리.
 		if (subMeshCount != static_cast<uint32_t>(shaderList.size()))
 		{
 			return;
 		}
 
-		for (uint32_t ix = 0; ix < subMeshCount; ix++)
+		for (uint32_t ix = 0; ix < subMeshCount; ++ix)
 		{
-			Renderer::Get().Submit(mesh.lock()->GetSubMesh(ix), shaderList[ix], transform);
+			Renderer::Get().Submit(
+				mesh.lock()->GetSubMesh(ix),
+				shaderList[ix],
+				transform,
+				isSkybox,
+				isUsingRenderTexture
+			);
 		}
 
 		//Renderer::Get().Submit(mesh.lock(), shader, transform);
@@ -55,7 +62,7 @@ namespace Craft
 
 	void Actor::QuitGame()
 	{
-		// 엔진 종료 요청
+		// 엔진 종료 요청.
 		Engine::Get().Quit();
 	}
 

@@ -21,7 +21,7 @@ namespace Craft
 		virtual void Tick(float deltaTime);
 		virtual void Draw();
 
-		// 게임 종료 요청 함수
+		// 게임 종료 요청 함수.
 		void QuitGame();
 
 		inline bool HasBeganPlay() const { return hasBeganPlay; }
@@ -31,7 +31,7 @@ namespace Craft
 		void SetOwner(std::weak_ptr<Level> newOwner);
 
 	public:
-		// 트랜스폼
+		// 트랜스폼.
 		std::shared_ptr<Transform> transform;
 
 	protected:
@@ -42,5 +42,11 @@ namespace Craft
 		std::weak_ptr<StaticMesh> mesh;
 		std::vector<std::shared_ptr<Shader>> shaderList;
 		std::weak_ptr<Level> owner;
+
+		// 큐브맵 여부 플래그.
+		bool isSkybox = false;
+
+		// 렌더 텍스처 사용 여부 플래그.
+		bool isUsingRenderTexture = false;
 	};
 }

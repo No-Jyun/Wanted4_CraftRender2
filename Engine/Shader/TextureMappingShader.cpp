@@ -4,6 +4,11 @@
 
 namespace Craft
 {
+	TextureMappingShader::TextureMappingShader()
+		: Shader(L"TextureMapping")
+	{
+	}
+
 	TextureMappingShader::TextureMappingShader(const std::string& textureName)
 		: Shader(L"TextureMapping")
 	{
